@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitHarvest - Farm Your Future</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#5DB075',
+                            600: '#4CAF50',
+                        },
+                        secondary: {
+                            500: '#FFC107',
+                            600: '#FFA000',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .farm-bg {
+            background-image: url('http://static.photos/nature/1200x630/42');
+            background-size: cover;
+            background-position: center;
+        }
+        .habit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Onboarding Flow -->
+    <div id="onboarding" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6 transition-all duration-500">
+        <!-- Screen 1: Welcome -->
+        <div id="welcome-screen" class="max-w-md text-center">
+            <div class="mb-8">
+                <div class="w-32 h-32 mx-auto bg-primary-500 rounded-full flex items-center justify-center text-white text-6xl">🌱</div>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Transforme seus hábitos em uma fazenda próspera</h1>
+            <p class="text-gray-600 mb-8">Cada hábito concluído vira adubo mágico para fazer sua fazenda crescer!</p>
+            <button onclick="nextScreen('welcome-screen', 'account-screen')" class="bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-full transition duration-200">Começar</button>
+        </div>
+
+        <!-- Screen 2: Account Creation -->
+        <div id="account-screen" class="max-w-md w-full hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Crie sua conta</h2>
+            <div class="space-y-4">
+                <div>
+                    <input type="email" placeholder="E-mail" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <input type="password" placeholder="Senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <button class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i data-feather="github" class="mr-2"></i> Continuar com Google
+                </button>
+                <button onclick="nextScreen('account-screen', 'habit-screen')" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: First Habit -->
+        <div id="habit-screen" class="max-w-md w-full hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Qual hábito você quer cultivar?</h2>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Beber água</button>
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Ler 10 min</button>
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Caminhar</button>
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Meditar</button>
+                </div>
+                <input type="text" placeholder="Ou digite seu hábito" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4">
+                <button onclick="nextScreen('habit-screen', 'farm-intro-screen')" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200">Continuar</button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Farm Introduction -->
+        <div id="farm-intro-screen" class="max-w-md w-full hidden text-center">
+            <div class="w-full h-48 bg-gray-200 rounded-lg mb-6 overflow-hidden relative">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-6xl">🌾</div>
+                </div>
+                <div class="absolute bottom-4 right-4">
+                    <div class="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center text-white text-2xl">👨‍🌾</div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md relative" style="margin-top: -20px;">
+                <div class="absolute -top-3 left-6 w-6 h-6 bg-white transform rotate-45"></div>
+                <p class="text-gray-700 mb-4">"Olá! Sou o Seu Espantalho. Para nossa fazenda crescer, precisamos dos seus hábitos! Cada um vira um adubo mágico!"</p>
+            </div>
+            <button onclick="completeOnboarding()" class="mt-8 bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-full transition duration-200">Vamos começar!</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary-500 rounded-full mr-2"></div>
+                    <h1 class="text-xl font-bold text-gray-800">HabitHarvest</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                        <i data-feather="droplet" class="w-4 h-4 text-primary-500 mr-1"></i>
+                        <span id="compost-count" class="font-medium">0</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                        <i data-feather="coin" class="w-4 h-4 text-secondary-500 mr-1"></i>
+                        <span id="coin-count" class="font-medium">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-6">
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="habits-tab" class="px-4 py-2 font-medium text-primary-500 border-b-2 border-primary-500">Hábitos</button>
+                <button id="farm-tab" class="px-4 py-2 font-medium text-gray-500">Fazenda</button>
+                <button id="shop-tab" class="px-4 py-2 font-medium text-gray-500">Loja</button>
+            </div>
+
+            <!-- Habits Tab Content -->
+            <div id="habits-content" class="space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Seus Hábitos</h2>
+                    <button class="text-primary-500 font-medium flex items-center">
+                        <i data-feather="plus" class="w-4 h-4 mr-1"></i> Adicionar
+                    </button>
+                </div>
+                
+                <div class="habit-card bg-white p-4 rounded-xl shadow-sm transition duration-200 cursor-pointer flex justify-between items-center">
+                    <div>
+                        <h3 class="font-medium">Beber água</h3>
+                        <p class="text-sm text-gray-500">Concluído 0 vezes hoje</p>
+                    </div>
+                    <button class="complete-habit bg-primary-500 hover:bg-primary-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition duration-200">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <div class="habit-card bg-white p-4 rounded-xl shadow-sm transition duration-200 cursor-pointer flex justify-between items-center">
+                    <div>
+                        <h3 class="font-medium">Ler 10 minutos</h3>
+                        <p class="text-sm text-gray-500">Concluído 0 vezes hoje</p>
+                    </div>
+                    <button class="complete-habit bg-primary-500 hover:bg-primary-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition duration-200">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <div class="habit-card bg-white p-4 rounded-xl shadow-sm transition duration-200 cursor-pointer flex justify-between items-center">
+                    <div>
+                        <h3 class="font-medium">Caminhar</h3>
+                        <p class="text-sm text-gray-500">Concluído 0 vezes hoje</p>
+                    </div>
+                    <button class="complete-habit bg-primary-500 hover:bg-primary-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition duration-200">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Farm Tab Content -->
+            <div id="farm-content" class="hidden">
+                <div class="bg-gray-100 rounded-xl p-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Sua Fazenda</h2>
+                    <p class="text-gray-600">Use adubo para acelerar o crescimento das suas plantações!</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="farm-plot bg-white p-4 rounded-xl shadow-sm h-40 flex items-center justify-center cursor-pointer relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-4xl">🌱</div>
+                        </div>
+                        <div class="absolute bottom-2 right-2 text-xs bg-white bg-opacity-80 px-2 py-1 rounded-full">
+                            2h restantes
+                        </div>
+                        <div class="farm-actions absolute inset-0 bg-black bg-opacity-50 hidden flex-col items-center justify-center space-y-2">
+                            <button class="bg-primary-500 hover:bg-primary-600 text-white text-sm px-3 py-1 rounded-full flex items-center">
+                                <i data-feather="droplet" class="w-3 h-3 mr-1"></i> Usar Adubo
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="farm-plot bg-gray-100 p-4 rounded-xl h-40 flex items-center justify-center cursor-pointer">
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">+</div>
+                            <p class="text-sm text-gray-600">Plantar</p>
+                            <p class="text-xs text-gray-500">Custo: 5 moedas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="farm-plot bg-gray-100 p-4 rounded-xl h-40 flex items-center justify-center cursor-pointer">
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">+</div>
+                            <p class="text-sm text-gray-600">Plantar</p>
+                            <p class="text-xs text-gray-500">Custo: 5 moedas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="farm-plot bg-gray-100 p-4 rounded-xl h-40 flex items-center justify-center cursor-pointer">
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">+</div>
+                            <p class="text-sm text-gray-600">Plantar</p>
+                            <p class="text-xs text-gray-500">Custo: 5 moedas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shop Tab Content -->
+            <div id="shop-content" class="hidden">
+                <div class="bg-gray-100 rounded-xl p-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Loja</h2>
+                    <p class="text-gray-600">Gaste suas moedas para melhorar sua fazenda!</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="w-full h-20 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-3xl">🌾</div>
+                        <h3 class="font-medium">Trigo</h3>
+                        <p class="text-sm text-gray-600 mb-2">Rende 10 moedas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium flex items-center">
+                                <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> 5
+                            </span>
+                            <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="w-full h-20 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-3xl">🌻</div>
+                        <h3 class="font-medium">Girassol</h3>
+                        <p class="text-sm text-gray-600 mb-2">Rende 15 moedas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium flex items-center">
+                                <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> 8
+                            </span>
+                            <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="w-full h-20 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-3xl">🌽</div>
+                        <h3 class="font-medium">Milho</h3>
+                        <p class="text-sm text-gray-600 mb-2">Rende 20 moedas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium flex items-center">
+                                <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> 12
+                            </span>
+                            <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="w-full h-20 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-3xl">🍓</div>
+                        <h3 class="font-medium">Morango</h3>
+                        <p class="text-sm text-gray-600 mb-2">Rende 30 moedas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium flex items-center">
+                                <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> 20
+                            </span>
+                            <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Onboarding navigation
+        function nextScreen(current, next) {
+            document.getElementById(current).classList.add('hidden');
+            document.getElementById(next).classList.remove('hidden');
+        }
+
+        function completeOnboarding() {
+            document.getElementById('onboarding').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('onboarding').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                feather.replace();
+            }, 500);
+        }
+
+        // Tab switching
+        document.getElementById('habits-tab').addEventListener('click', function() {
+            this.classList.add('text-primary-500', 'border-primary-500');
+            this.classList.remove('text-gray-500');
+            document.getElementById('farm-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('farm-tab').classList.add('text-gray-500');
+            document.getElementById('shop-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('shop-tab').classList.add('text-gray-500');
+            
+            document.getElementById('habits-content').classList.remove('hidden');
+            document.getElementById('farm-content').classList.add('hidden');
+            document.getElementById('shop-content').classList.add('hidden');
+        });
+
+        document.getElementById('farm-tab').addEventListener('click', function() {
+            this.classList.add('text-primary-500', 'border-primary-500');
+            this.classList.remove('text-gray-500');
+            document.getElementById('habits-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('habits-tab').classList.add('text-gray-500');
+            document.getElementById('shop-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('shop-tab').classList.add('text-gray-500');
+            
+            document.getElementById('habits-content').classList.add('hidden');
+            document.getElementById('farm-content').classList.remove('hidden');
+            document.getElementById('shop-content').classList.add('hidden');
+        });
+
+        document.getElementById('shop-tab').addEventListener('click', function() {
+            this.classList.add('text-primary-500', 'border-primary-500');
+            this.classList.remove('text-gray-500');
+            document.getElementById('habits-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('habits-tab').classList.add('text-gray-500');
+            document.getElementById('farm-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('farm-tab').classList.add('text-gray-500');
+            
+            document.getElementById('habits-content').classList.add('hidden');
+            document.getElementById('farm-content').classList.add('hidden');
+            document.getElementById('shop-content').classList.remove('hidden');
+        });
+
+        // Farm plot interactions
+        document.querySelectorAll('.farm-plot').forEach(plot => {
+            plot.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('bg-gray-100')) {
+                    this.querySelector('.farm-actions').classList.remove('hidden');
+                }
+            });
+            
+            plot.addEventListener('mouseleave', function() {
+                this.querySelector('.farm-actions')?.classList.add('hidden');
+            });
+        });
+
+        // Complete habit animation
+        document.querySelectorAll('.complete-habit').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Create confetti
+                for (let i = 0; i < 20; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = ['#f00', '#0f0', '#00f', '#ff0', '#f0f'][Math.floor(Math.random() * 5)];
+                    this.parentElement.appendChild(confetti);
+                    
+                    anime({
+                        targets: confetti,
+                        translateY: [0, -100],
+                        opacity: [1, 0],
+                        duration: 1000,
+                        easing: 'easeOutExpo',
+                        complete: () => confetti.remove()
+                    });
+                }
+                
+                // Update counters
+                const compostCount = document.getElementById('compost-count');
+                const coinCount = document.getElementById('coin-count');
+                
+                compostCount.textContent = parseInt(compostCount.textContent) + 1;
+                coinCount.textContent = parseInt(coinCount.textContent) + 5;
+                
+                // Show reward bubble
+                const bubble = document.createElement('div');
+                bubble.className = 'absolute bg-white px-3 py-1 rounded-full shadow-sm text-sm font-medium';
+                bubble.innerHTML = '+1 <i data-feather="droplet" class="w-3 h-3 text-primary-500 inline"></i> +5 <i data-feather="coin" class="w-3 h-3 text-secondary-500 inline"></i>';
+                bubble.style.left = '50%';
+                bubble.style.top = '0';
+                bubble.style.transform = 'translateX(-50%)';
+                this.parentElement.appendChild(bubble);
+                
+                anime({
+                    targets: bubble,
+                    translateY: -40,
+                    opacity: [1, 0],
+                    duration: 1000,
+                    easing: 'easeOutExpo',
+                    complete: () => bubble.remove()
+                });
+                
+                // Update habit count
+                const habitText = this.parentElement.querySelector('p');
+                const countMatch = habitText.textContent.match(/(\d+)/);
+                const count = countMatch ? parseInt(countMatch[0]) + 1 : 1;
+                habitText.textContent = `Concluído ${count} vezes hoje`;
+                
+                // Replace feather icons
+                setTimeout(() => feather.replace(), 100);
+            });
+        });
+
+        // Initialize
+        feather.replace();
+    </script>
+</body>
+</html>
