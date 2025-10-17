@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitHarvest - Farm Your Future</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#5DB075',
+                            600: '#4CAF50',
+                        },
+                        secondary: {
+                            500: '#FFC107',
+                            600: '#FFA000',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .farm-bg {
+            background-image: url('http://static.photos/nature/1200x630/42');
+            background-size: cover;
+            background-position: center;
+        }
+        .habit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flying-resource {
+            position: fixed;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Onboarding Flow -->
+    <div id="onboarding" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6 transition-all duration-500">
+        <!-- Screen 1: Welcome -->
+        <div id="welcome-screen" class="max-w-md text-center">
+            <div class="mb-8">
+                <div class="w-32 h-32 mx-auto bg-primary-500 rounded-full flex items-center justify-center text-white text-6xl">🌱</div>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Transforme seus hábitos em uma fazenda próspera</h1>
+            <p class="text-gray-600 mb-8">Cada hábito concluído vira adubo mágico para fazer sua fazenda crescer!</p>
+            <button onclick="nextScreen('welcome-screen', 'account-screen')" class="bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-full transition duration-200">Começar</button>
+        </div>
+
+        <!-- Screen 2: Account Creation -->
+        <div id="account-screen" class="max-w-md w-full hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Crie sua conta</h2>
+            <div class="space-y-4">
+                <div>
+                    <input type="email" placeholder="E-mail" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <input type="password" placeholder="Senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <button class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i data-feather="github" class="mr-2"></i> Continuar com Google
+                </button>
+                <button onclick="nextScreen('account-screen', 'habit-screen')" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200">Próximo</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: First Habit -->
+        <div id="habit-screen" class="max-w-md w-full hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Qual hábito você quer cultivar?</h2>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Beber água</button>
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Ler 10 min</button>
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Caminhar</button>
+                    <button class="bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-lg transition duration-200">Meditar</button>
+                </div>
+                <input type="text" placeholder="Ou digite seu hábito" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4">
+                <button onclick="nextScreen('habit-screen', 'farm-intro-screen')" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200">Continuar</button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Farm Introduction -->
+        <div id="farm-intro-screen" class="max-w-md w-full hidden text-center">
+            <div class="w-full h-48 bg-gray-200 rounded-lg mb-6 overflow-hidden relative">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-6xl">🌾</div>
+                </div>
+                <div class="absolute bottom-4 right-4">
+                    <div class="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center text-white text-2xl">👨‍🌾</div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md relative" style="margin-top: -20px;">
+                <div class="absolute -top-3 left-6 w-6 h-6 bg-white transform rotate-45"></div>
+                <p class="text-gray-700 mb-4">"Olá! Sou o Seu Espantalho. Para nossa fazenda crescer, precisamos dos seus hábitos! Cada um vira um adubo mágico!"</p>
+            </div>
+            <button onclick="completeOnboarding()" class="mt-8 bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-full transition duration-200">Vamos começar!</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary-500 rounded-full mr-2"></div>
+                    <h1 class="text-xl font-bold text-gray-800">HabitHarvest</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                        <i data-feather="droplet" class="w-4 h-4 text-primary-500 mr-1"></i>
+                        <span id="compost-count" class="font-medium">0</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                        <i data-feather="coin" class="w-4 h-4 text-secondary-500 mr-1"></i>
+                        <span id="coin-count" class="font-medium">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-6">
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-6 relative">
+                <button id="habits-tab" class="px-4 py-2 font-medium text-primary-500 border-b-2 border-primary-500">Hábitos</button>
+                <button id="farm-tab" class="px-4 py-2 font-medium text-gray-500 relative">Fazenda</button>
+                <button id="shop-tab" class="px-4 py-2 font-medium text-gray-500">Loja</button>
+            </div>
+
+            <!-- Habits Tab Content -->
+            <div id="habits-content" class="space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Seus Hábitos</h2>
+                    <button class="text-primary-500 font-medium flex items-center">
+                        <i data-feather="plus" class="w-4 h-4 mr-1"></i> Adicionar
+                    </button>
+                </div>
+                
+                <div class="habit-card bg-white p-4 rounded-xl shadow-sm transition duration-200 cursor-pointer flex justify-between items-center relative">
+                    <div>
+                        <h3 class="font-medium">Beber água</h3>
+                        <p class="text-sm text-gray-500">Concluído 0 vezes hoje</p>
+                    </div>
+                    <button class="complete-habit bg-primary-500 hover:bg-primary-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition duration-200">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <div class="habit-card bg-white p-4 rounded-xl shadow-sm transition duration-200 cursor-pointer flex justify-between items-center relative">
+                    <div>
+                        <h3 class="font-medium">Ler 10 minutos</h3>
+                        <p class="text-sm text-gray-500">Concluído 0 vezes hoje</p>
+                    </div>
+                    <button class="complete-habit bg-primary-500 hover:bg-primary-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition duration-200">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <div class="habit-card bg-white p-4 rounded-xl shadow-sm transition duration-200 cursor-pointer flex justify-between items-center relative">
+                    <div>
+                        <h3 class="font-medium">Caminhar</h3>
+                        <p class="text-sm text-gray-500">Concluído 0 vezes hoje</p>
+                    </div>
+                    <button class="complete-habit bg-primary-500 hover:bg-primary-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition duration-200">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Farm Tab Content -->
+            <div id="farm-content" class="hidden">
+                <div class="bg-gray-100 rounded-xl p-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Sua Fazenda</h2>
+                    <p class="text-gray-600">Use adubo para acelerar o crescimento das suas plantações!</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Farm plots will be dynamically generated -->
+                </div>
+
+                <!-- Shop Section in Farm -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Loja de Sementes</h3>
+                    <div class="grid grid-cols-2 gap-4" id="seed-shop">
+                        <!-- Seed items will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shop Tab Content -->
+            <div id="shop-content" class="hidden">
+                <div class="bg-gray-100 rounded-xl p-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Loja</h2>
+                    <p class="text-gray-600">Gaste suas moedas para melhorar sua fazenda!</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="w-full h-20 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-3xl">🌾</div>
+                        <h3 class="font-medium">Trigo</h3>
+                        <p class="text-sm text-gray-600 mb-2">Rende 10 moedas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium flex items-center">
+                                <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> 5
+                            </span>
+                            <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="w-full h-20 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-3xl">🌻</div>
+                        <h3 class="font-medium">Girassol</h3>
+                        <p class="text-sm text-gray-600 mb-2">Rende 15 moedas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium flex items-center">
+                                <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> 8
+                            </span>
+                            <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 🎮 GAME STATE MANAGEMENT
+        let gameState = {
+            compost: 10, // Starting resources for immediate testing
+            coins: 20,
+            habits: [
+                { name: 'Beber água', completedToday: 0, totalCompletions: 0 },
+                { name: 'Ler 10 minutos', completedToday: 0, totalCompletions: 0 },
+                { name: 'Caminhar', completedToday: 0, totalCompletions: 0 }
+            ],
+            farmPlots: [
+                { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 },
+                { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 },
+                { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 },
+                { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 }
+            ],
+            unlockedSeeds: ['wheat'],
+            firstTime: true
+        };
+
+        // ❗TEMPOS REDUZIDOS para validação (30 seg, 45 seg, 1 min)
+        const seedCatalog = {
+            wheat: { 
+                name: 'Trigo', 
+                emoji: '🌾',
+                cost: 5, 
+                reward: 10, 
+                growthTime: 30 * 1000, // 30 segundos
+                color: 'green'
+            },
+            sunflower: { 
+                name: 'Girassol', 
+                emoji: '🌻',
+                cost: 8, 
+                reward: 15, 
+                growthTime: 45 * 1000, // 45 segundos
+                color: 'yellow'
+            },
+            corn: { 
+                name: 'Milho', 
+                emoji: '🌽',
+                cost: 12, 
+                reward: 20, 
+                growthTime: 60 * 1000, // 1 minuto
+                color: 'yellow'
+            }
+        };
+
+        // 🎯 PERSISTENCE FUNCTIONS
+        function saveGameState() {
+            try {
+                localStorage.setItem('habitHarvest', JSON.stringify(gameState));
+            } catch (error) {
+                console.error('Error saving game state:', error);
+            }
+        }
+
+        function loadGameState() {
+            try {
+                const saved = localStorage.getItem('habitHarvest');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Validate structure
+                    if (parsed.habits && parsed.farmPlots) {
+                        gameState = parsed;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading game state:', error);
+                // Keep default state
+            }
+        }
+
+        function resetGameState() {
+            gameState = {
+                compost: 10,
+                coins: 20,
+                habits: [
+                    { name: 'Beber água', completedToday: 0, totalCompletions: 0 },
+                    { name: 'Ler 10 minutos', completedToday: 0, totalCompletions: 0 },
+                    { name: 'Caminhar', completedToday: 0, totalCompletions: 0 }
+                ],
+                farmPlots: [
+                    { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 },
+                    { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 },
+                    { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 },
+                    { planted: false, cropType: null, plantedAt: null, growthTime: null, progress: 0 }
+                ],
+                unlockedSeeds: ['wheat'],
+                firstTime: true
+            };
+            saveGameState();
+        }
+
+        // 🎮 GAME FUNCTIONS
+        function completeHabit(habitIndex) {
+            const habit = gameState.habits[habitIndex];
+            
+            // Update state
+            habit.completedToday++;
+            habit.totalCompletions++;
+            gameState.compost += 1;
+            gameState.coins += 5;
+            
+            // Save and update UI
+            saveGameState();
+            updateResourcesUI();
+            updateHabitsUI();
+            
+            // Show farm notification
+            showFarmNotification();
+            
+            return true;
+        }
+
+        function plantSeed(plotIndex, seedType) {
+            if (gameState.coins < seedCatalog[seedType].cost) {
+                showMessage('Moedas insuficientes!', 'error');
+                return false;
+            }
+            
+            gameState.coins -= seedCatalog[seedType].cost;
+            gameState.farmPlots[plotIndex] = {
+                planted: true,
+                cropType: seedType,
+                plantedAt: Date.now(),
+                growthTime: seedCatalog[seedType].growthTime,
+                progress: 0
+            };
+            
+            saveGameState();
+            updateFarmUI();
+            updateResourcesUI();
+            showMessage(`${seedCatalog[seedType].emoji} ${seedCatalog[seedType].name} plantado!`);
+            
+            return true;
+        }
+
+        function harvestCrop(plotIndex) {
+            const plot = gameState.farmPlots[plotIndex];
+            const seed = seedCatalog[plot.cropType];
+            
+            // Give reward
+            gameState.coins += seed.reward;
+            
+            // Reset plot
+            gameState.farmPlots[plotIndex] = {
+                planted: false,
+                cropType: null,
+                plantedAt: null,
+                growthTime: null,
+                progress: 0
+            };
+            
+            saveGameState();
+            updateFarmUI();
+            updateResourcesUI();
+            showMessage(`🌾 Colhido! +${seed.reward} moedas`);
+            
+            return true;
+        }
+
+        function useCompost(plotIndex) {
+            if (gameState.compost < 1) {
+                showMessage('Adubo insuficiente! Complete mais hábitos.', 'error');
+                return false;
+            }
+            
+            const plot = gameState.farmPlots[plotIndex];
+            if (!plot.planted) {
+                showMessage('Plante algo primeiro!', 'error');
+                return false;
+            }
+            
+            // Reduce growth time by 50%
+            const timePassed = Date.now() - plot.plantedAt;
+            const remainingTime = plot.growthTime - timePassed;
+            plot.growthTime = timePassed + (remainingTime * 0.5);
+            plot.plantedAt = Date.now();
+            
+            gameState.compost -= 1;
+            
+            saveGameState();
+            updateFarmUI();
+            updateResourcesUI();
+            showMessage('💫 Adubo mágico aplicado! Crescimento acelerado!');
+            
+            return true;
+        }
+
+        // 🎨 UI UPDATE FUNCTIONS
+        function updateResourcesUI() {
+            document.getElementById('compost-count').textContent = gameState.compost;
+            document.getElementById('coin-count').textContent = gameState.coins;
+        }
+
+        function updateHabitsUI() {
+            const habitCards = document.querySelectorAll('.habit-card');
+            habitCards.forEach((card, index) => {
+                const habit = gameState.habits[index];
+                if (habit) {
+                    const countText = card.querySelector('p');
+                    countText.textContent = `Concluído ${habit.completedToday} vezes hoje`;
+                }
+            });
+        }
+
+        function updateFarmUI() {
+            const farmContainer = document.querySelector('#farm-content .grid');
+            const seedShop = document.getElementById('seed-shop');
+            
+            // Update farm plots
+            farmContainer.innerHTML = '';
+            gameState.farmPlots.forEach((plot, index) => {
+                const plotElement = createFarmPlotElement(plot, index);
+                farmContainer.appendChild(plotElement);
+            });
+            
+            // Update seed shop
+            seedShop.innerHTML = '';
+            Object.entries(seedCatalog).forEach(([seedKey, seed]) => {
+                if (gameState.unlockedSeeds.includes(seedKey)) {
+                    const seedElement = createSeedShopElement(seedKey, seed);
+                    seedShop.appendChild(seedElement);
+                }
+            });
+        }
+
+        function createFarmPlotElement(plot, index) {
+            const plotDiv = document.createElement('div');
+            plotDiv.className = `farm-plot bg-white p-4 rounded-xl shadow-sm h-40 flex items-center justify-center cursor-pointer relative overflow-hidden border-2 ${plot.planted ? 'border-' + seedCatalog[plot.cropType].color + '-200' : 'border-gray-100'}`;
+            
+            if (plot.planted) {
+                const progress = calculateGrowthProgress(plot);
+                const seed = seedCatalog[plot.cropType];
+                
+                plotDiv.innerHTML = `
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-4xl transform scale-${Math.max(50, Math.floor(progress * 100)) / 100}">${seed.emoji}</div>
+                    </div>
+                    <div class="absolute bottom-2 right-2 text-xs bg-white bg-opacity-80 px-2 py-1 rounded-full">
+                        ${formatTimeRemaining(plot)} restante
+                    </div>
+                    <div class="absolute top-2 left-2 text-xs bg-white bg-opacity-80 px-2 py-1 rounded-full">
+                        ${Math.floor(progress * 100)}%
+                    </div>
+                    <div class="farm-actions absolute inset-0 bg-black bg-opacity-50 hidden flex-col items-center justify-center space-y-2">
+                        ${progress >= 1 ? 
+                            `<button onclick="harvestCrop(${index})" class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded-full flex items-center">
+                                <i data-feather="package" class="w-3 h-3 mr-1"></i> Colher
+                            </button>` : 
+                            `<button onclick="useCompost(${index})" class="bg-primary-500 hover:bg-primary-600 text-white text-sm px-3 py-1 rounded-full flex items-center">
+                                <i data-feather="droplet" class="w-3 h-3 mr-1"></i> Usar Adubo
+                            </button>`
+                        }
+                    </div>
+                `;
+            } else {
+                plotDiv.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-2xl mb-1">+</div>
+                        <p class="text-sm text-gray-600">Plantar</p>
+                        <p class="text-xs text-gray-500">Toque para escolher</p>
+                    </div>
+                `;
+                
+                plotDiv.addEventListener('click', () => showSeedSelection(index));
+            }
+            
+            // Hover actions
+            plotDiv.addEventListener('mouseenter', function() {
+                if (plot.planted) {
+                    this.querySelector('.farm-actions').classList.remove('hidden');
+                }
+            });
+            
+            plotDiv.addEventListener('mouseleave', function() {
+                this.querySelector('.farm-actions')?.classList.add('hidden');
+            });
+            
+            return plotDiv;
+        }
+
+        function createSeedShopElement(seedKey, seed) {
+            const seedDiv = document.createElement('div');
+            seedDiv.className = 'bg-white p-4 rounded-xl shadow-sm';
+            seedDiv.innerHTML = `
+                <div class="w-full h-20 bg-gray-100 rounded-lg mb-2 flex items-center justify-center text-3xl">${seed.emoji}</div>
+                <h3 class="font-medium">${seed.name}</h3>
+                <p class="text-sm text-gray-600 mb-2">Rende ${seed.reward} moedas</p>
+                <p class="text-xs text-gray-500 mb-2">Cresce em ${seed.growthTime / 1000}s</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium flex items-center">
+                        <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i> ${seed.cost}
+                    </span>
+                    <button onclick="buySeed('${seedKey}')" class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-2 py-1 rounded-full">Comprar</button>
+                </div>
+            `;
+            return seedDiv;
+        }
+
+        function calculateGrowthProgress(plot) {
+            if (!plot.planted) return 0;
+            const timePassed = Date.now() - plot.plantedAt;
+            return Math.min(1, timePassed / plot.growthTime);
+        }
+
+        function formatTimeRemaining(plot) {
+            if (!plot.planted) return '0s';
+            const timePassed = Date.now() - plot.plantedAt;
+            const remaining = Math.max(0, plot.growthTime - timePassed);
+            return `${Math.ceil(remaining / 1000)}s`;
+        }
+
+        // 🎪 UX ENHANCEMENT FUNCTIONS
+        function showFarmNotification() {
+            const farmTab = document.getElementById('farm-tab');
+            if (!farmTab.querySelector('.notification-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'notification-badge';
+                badge.textContent = '!';
+                farmTab.appendChild(badge);
+            }
+        }
+
+        function removeFarmNotification() {
+            const farmTab = document.getElementById('farm-tab');
+            const badge = farmTab.querySelector('.notification-badge');
+            if (badge) {
+                badge.remove();
+            }
+        }
+
+        function showSeedSelection(plotIndex) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-6 max-w-sm mx-4">
+                    <h3 class="text-lg font-bold mb-4">Escolha uma semente</h3>
+                    <div class="space-y-2">
+                        ${Object.entries(seedCatalog).map(([seedKey, seed]) => `
+                            <button onclick="selectSeed(${plotIndex}, '${seedKey}')" 
+                                    class="w-full text-left p-3 rounded-lg border hover:bg-gray-50 flex justify-between items-center ${gameState.coins < seed.cost ? 'opacity-50' : ''}">
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">${seed.emoji}</span>
+                                    <div>
+                                        <div class="font-medium">${seed.name}</div>
+                                        <div class="text-sm text-gray-500">${seed.growthTime / 1000}s • ${seed.reward} moedas</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center text-sm">
+                                    <i data-feather="coin" class="w-3 h-3 text-secondary-500 mr-1"></i>
+                                    ${seed.cost}
+                                </div>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg">Cancelar</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            feather.replace();
+        }
+
+        function selectSeed(plotIndex, seedKey) {
+            plantSeed(plotIndex, seedKey);
+            document.querySelector('.fixed.inset-0')?.remove();
+        }
+
+        function buySeed(seedKey) {
+            // For now, just show message - seeds are automatically unlocked
+            showMessage('Semente desbloqueada! Você pode plantar agora.');
+        }
+
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-red-500' : 'bg-primary-500';
+            messageDiv.className = `fixed top-4 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-full shadow-lg z-50`;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        function showFarmImpactMessage() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-xl shadow-xl z-50 text-center max-w-sm';
+            messageDiv.innerHTML = `
+                <div class="text-4xl mb-4">🌱</div>
+                <h3 class="text-xl font-bold mb-2">Hábito Concluído!</h3>
+                <p class="text-gray-600 mb-4">Você ganhou <strong>1 adubo</strong> para alimentar suas plantinhas!</p>
+                <button onclick="this.closest('.fixed').remove()" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full">Legal!</button>
+            `;
+            document.body.appendChild(messageDiv);
+        }
+
+        function createFlyingResourceAnimation(startX, startY, resourceType) {
+            const flyingElement = document.createElement('div');
+            flyingElement.className = 'flying-resource';
+            flyingElement.innerHTML = resourceType === 'compost' ? 
+                '<i data-feather="droplet" class="w-6 h-6 text-primary-500"></i>' :
+                '<i data-feather="coin" class="w-6 h-6 text-secondary-500"></i>';
+            flyingElement.style.left = startX + 'px';
+            flyingElement.style.top = startY + 'px';
+            document.body.appendChild(flyingElement);
+            feather.replace();
+            
+            const targetElement = resourceType === 'compost' ? 
+                document.querySelector('[data-feather="droplet"]').closest('.flex.items-center') :
+                document.querySelector('[data-feather="coin"]').closest('.flex.items-center');
+            
+            const targetRect = targetElement.getBoundingClientRect();
+            
+            anime({
+                targets: flyingElement,
+                translateX: targetRect.left - startX,
+                translateY: targetRect.top - startY,
+                scale: [1, 0.5],
+                opacity: [1, 0],
+                duration: 1000,
+                easing: 'easeOutCubic',
+                complete: () => flyingElement.remove()
+            });
+        }
+
+        // 🕹️ GAME LOOP
+        function gameLoop() {
+            let needsUpdate = false;
+            
+            gameState.farmPlots.forEach((plot, index) => {
+                if (plot.planted) {
+                    const progress = calculateGrowthProgress(plot);
+                    if (progress >= 1 && plot.progress < 1) {
+                        plot.progress = 1;
+                        needsUpdate = true;
+                        showFarmNotification();
+                    }
+                }
+            });
+            
+            if (needsUpdate) {
+                updateFarmUI();
+            }
+        }
+
+        // 📱 INITIALIZATION
+        function initializeGame() {
+            loadGameState();
+            updateResourcesUI();
+            updateHabitsUI();
+            updateFarmUI();
+            
+            // Start game loop
+            setInterval(gameLoop, 1000);
+        }
+
+        // 🎭 EXISTING UI FUNCTIONS
+        function nextScreen(current, next) {
+            document.getElementById(current).classList.add('hidden');
+            document.getElementById(next).classList.remove('hidden');
+        }
+
+        function completeOnboarding() {
+            document.getElementById('onboarding').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('onboarding').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                initializeGame();
+                feather.replace();
+            }, 500);
+        }
+
+        // Tab switching
+        document.getElementById('habits-tab').addEventListener('click', function() {
+            this.classList.add('text-primary-500', 'border-primary-500');
+            this.classList.remove('text-gray-500');
+            document.getElementById('farm-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('farm-tab').classList.add('text-gray-500');
+            document.getElementById('shop-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('shop-tab').classList.add('text-gray-500');
+            
+            document.getElementById('habits-content').classList.remove('hidden');
+            document.getElementById('farm-content').classList.add('hidden');
+            document.getElementById('shop-content').classList.add('hidden');
+        });
+
+        document.getElementById('farm-tab').addEventListener('click', function() {
+            this.classList.add('text-primary-500', 'border-primary-500');
+            this.classList.remove('text-gray-500');
+            document.getElementById('habits-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('habits-tab').classList.add('text-gray-500');
+            document.getElementById('shop-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('shop-tab').classList.add('text-gray-500');
+            
+            document.getElementById('habits-content').classList.add('hidden');
+            document.getElementById('farm-content').classList.remove('hidden');
+            document.getElementById('shop-content').classList.add('hidden');
+            
+            removeFarmNotification();
+        });
+
+        document.getElementById('shop-tab').addEventListener('click', function() {
+            this.classList.add('text-primary-500', 'border-primary-500');
+            this.classList.remove('text-gray-500');
+            document.getElementById('habits-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('habits-tab').classList.add('text-gray-500');
+            document.getElementById('farm-tab').classList.remove('text-primary-500', 'border-primary-500');
+            document.getElementById('farm-tab').classList.add('text-gray-500');
+            
+            document.getElementById('habits-content').classList.add('hidden');
+            document.getElementById('farm-content').classList.add('hidden');
+            document.getElementById('shop-content').classList.remove('hidden');
+        });
+
+        // Enhanced complete habit with animations
+        document.querySelectorAll('.complete-habit').forEach((button, index) => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Get position for flying animation
+                const rect = this.getBoundingClientRect();
+                const startX = rect.left + rect.width / 2;
+                const startY = rect.top + rect.height / 2;
+                
+                // Complete habit logic
+                if (completeHabit(index)) {
+                    // Create confetti
+                    for (let i = 0; i < 20; i++) {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.left = Math.random() * 100 + '%';
+                        confetti.style.top = Math.random() * 100 + '%';
+                        confetti.style.backgroundColor = ['#f00', '#0f0', '#00f', '#ff0', '#f0f'][Math.floor(Math.random() * 5)];
+                        this.parentElement.appendChild(confetti);
+                        
+                        anime({
+                            targets: confetti,
+                            translateY: [0, -100],
+                            opacity: [1, 0],
+                            duration: 1000,
+                            easing: 'easeOutExpo',
+                            complete: () => confetti.remove()
+                        });
+                    }
+                    
+                    // Create flying resources
+                    createFlyingResourceAnimation(startX, startY, 'compost');
+                    setTimeout(() => createFlyingResourceAnimation(startX, startY, 'coin'), 200);
+                    
+                    // Show farm impact message
+                    setTimeout(() => showFarmImpactMessage(), 600);
+                    
+                    // Show reward bubble
+                    const bubble = document.createElement('div');
+                    bubble.className = 'absolute bg-white px-3 py-1 rounded-full shadow-sm text-sm font-medium';
+                    bubble.innerHTML = '+1 <i data-feather="droplet" class="w-3 h-3 text-primary-500 inline"></i> +5 <i data-feather="coin" class="w-3 h-3 text-secondary-500 inline"></i>';
+                    bubble.style.left = '50%';
+                    bubble.style.top = '0';
+                    bubble.style.transform = 'translateX(-50%)';
+                    this.parentElement.appendChild(bubble);
+                    
+                    anime({
+                        targets: bubble,
+                        translateY: -40,
+                        opacity: [1, 0],
+                        duration: 1000,
+                        easing: 'easeOutExpo',
+                        complete: () => bubble.remove()
+                    });
+                    
+                    // Update habit count
+                    const habitText = this.parentElement.querySelector('p');
+                    const habit = gameState.habits[index];
+                    habitText.textContent = `Concluído ${habit.completedToday} vezes hoje`;
+                    
+                    // Replace feather icons
+                    setTimeout(() => feather.replace(), 100);
+                }
+            });
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+        });
+
+        // Debug function for testing
+        window.debugReset = function() {
+            if (confirm('Resetar todo o progresso?')) {
+                resetGameState();
+                location.reload();
+            }
+        };
+    </script>
+</body>
+</html>
